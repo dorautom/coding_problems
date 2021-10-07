@@ -21,56 +21,42 @@
 // SOFTWARE.
 
 #include <iostream>
-#include <fstream>
-#include <string>
+#include <unordered_map>
+#include <tuple>
+#include <vector>
 #include <list>
 
-int main(int argc, char** argv)
+typedef std::tuple<int, int> pair_t;
+typedef std::list<pair_t> pair_list_t;
+
+pair_list_t find_pairs(std::vector<int>& tab, int diff)
 {
-    if (argc < 2)
+    std::unordered_map<int, bool> set;
+    pair_list_t pairs;
+
+    for (auto value : tab)
     {
-        std::cout << "need file name argument\n";
-        return 0;
+        set[value] = true;
     }
-    const char* const filename = argv[1];
-    int lines_to_print = 5;
-    std::cout << "Input file name: " << filename << '\n';
-    if (argc > 2)
+    for (auto value : tab)
     {
-        lines_to_print = std::atoi(argv[2]);
-    }
-    std::cout << "Lines to print: " << lines_to_print << '\n';
-
-    std::ifstream input(filename, std::ios_base::in);
-    if (!input.good())
-    {
-        std::cerr << "error opening file!\n";
-        return -1;
-    }
-
-    input.seekg(0, std::ios_base::end);
-    std::cout << "file size: " << input.tellg() << '\n';
-    input.seekg(0, std::ios_base::beg);
-
-    std::string line;
-    std::list<std::string> tail;
-
-    while (!input.eof())
-    {
-        std::getline(input, line);
-        tail.push_back(line);
-        if (tail.size() > lines_to_print)
+        if (set.find(value + diff) != set.end())
         {
-            tail.pop_front();
+            pairs.emplace_back(std::make_tuple(value, value + diff));
         }
     }
+    return pairs;
+}
 
-    std::cout << "Last " << lines_to_print << " lines\n";
 
-    for (auto s : tail)
+int main()
+{
+    std::vector<int> example = { 1, 7, 5, 9, 2, 12, 3 };
+    pair_list_t pairs = find_pairs(example, 2);
+    for (auto pair : pairs)
     {
-        std::cout << s << '\n';
+        std::cout << '(' << std::get<0>(pair) << ',' << std::get<1>(pair) << "),";
     }
-
+    std::cout << '\n';
     return 0;
 }
