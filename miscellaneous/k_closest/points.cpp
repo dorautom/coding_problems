@@ -27,32 +27,33 @@
 #include <iostream>
 #include <cassert>
 
-typedef uint32_t star_id;
+typedef uint32_t PointID;
 
-struct star
+struct Point
 {
-  star_id id;
+  PointID id;
   float x;
   float y;
   float z;
-  star(star_id id0, float x0, float y0, float z0) : id(id0), x(x0), y(y0), z(z0)
-  {
-  }
+
+  // Point(PointID id0, float x0, float y0, float z0) : id(id0), x(x0), y(y0), z(z0)
+  // {
+  // }
 };
 
-double distance(const star& a, const star& b)
+double distance(const Point& a, const Point& b)
 {
   return std::sqrt(std::pow(static_cast<double>(a.x - b.x), 2) + std::pow(static_cast<double>(a.y - b.y), 2) + std::pow(static_cast<double>(a.z - b.z), 2));
 }
 
-double distance_from_earth(const star& a)
+double distance_from_center(const Point& a)
 {
   return std::sqrt(std::pow(static_cast<double>(a.x), 2) + std::pow(static_cast<double>(a.y), 2) + std::pow(static_cast<double>(a.z), 2));
 }
 
-std::vector<star> getInputData()
+std::vector<Point> getInputData()
 {
-    return std::vector<star>(
+    return std::vector<Point>(
             {
                 {0, .1f, .5f, .2f},
                 {1, 30, 40, 50},
@@ -67,33 +68,43 @@ std::vector<star> getInputData()
     );
 }
 
-// TBD: detach algorihtm from specific data structure using template and custom compare function
-std::vector<star_id> getClosest(const std::vector<star>& stars, uint32_t k)
+typedef std::tuple<double, Point> PointDistance;
+
+struct PointDistanceCompareLess
 {
-  typedef std::tuple<double, star_id> star_distance;
-  std::priority_queue<star_distance, std::vector<star_distance>> k_closest;
-  for (auto& star : stars)
+  bool operator()(PointDistance& a, PointDistance& b)
   {
-    double distance = distance_from_earth(star);
+    return std::get<0>(a) <= std::get<0>(b);
+  }
+};
+
+// TBD: detach algorihtm from specific data structure using template and custom compare function
+std::vector<PointDistance> getClosest(const std::vector<Point>& points, uint32_t k)
+{
+  std::priority_queue<PointDistance, std::vector<PointDistance>, PointDistanceCompareLess> k_closest;
+  for (const auto& point : points)
+  {
+    double distance = distance_from_center(point);
     if (k_closest.size() < k)
     {
-      k_closest.push(std::make_tuple(distance, star.id));
+      PointDistance item = std::make_tuple(distance, point);
+      k_closest.push(item);
     }
     else
     {
       if (distance < std::get<0>(k_closest.top()))
       {
         k_closest.pop();
-        k_closest.push(std::make_tuple(distance, star.id));
+        k_closest.push(std::make_tuple(distance, point));
       }
     }
   }
 
-  std::vector<star_id> result;
+  std::vector<PointDistance> result;
   result.reserve(k);
   while (!k_closest.empty())
   {
-    result.push_back(std::get<1>(k_closest.top()));
+    result.push_back(k_closest.top());
     k_closest.pop();
   }
   return result;
@@ -101,13 +112,13 @@ std::vector<star_id> getClosest(const std::vector<star>& stars, uint32_t k)
 
 int main()
 {
-  uint32_t k = 5;
-  std::vector<star_id> k_closest = getClosest(getInputData(), k);
+  uint32_t k = 3;
+  std::vector<PointDistance> k_closest = getClosest(getInputData(), k);
   std::cout << k << "-closest:\n";
   assert(k_closest.size() == k);
-  for (auto id : k_closest)
+  for (auto item : k_closest)
   {
-    std::cout << id << '\n';
+    std::cout << std::get<0>(item) << '\n';
   }
   return 0;
 }
