@@ -21,9 +21,6 @@
 // SOFTWARE.
 
 #include <cmath>
-#include <vector>
-#include <queue>
-#include <tuple>
 #include <iostream>
 #include <cassert>
 #include "min_finder.h"
@@ -54,7 +51,6 @@ std::vector<Point> getInputData()
 {
     return std::vector<Point>(
             {
-                {0, .1f, .5f, .2f},
                 {1, 30, 40, 50},
                 {2, 1, 1, 1},
                 {3, 3.0f, 4.5f, 5.0f},
@@ -63,6 +59,7 @@ std::vector<Point> getInputData()
                 {6, 5.0f, 6.0f, 3.0f},
                 {7, .01f, .02f, .04f},
                 {8, 5.0f, 6.0f, 3.0f},
+                {9, .1f, .5f, .2f},
         }
     );
 }
@@ -71,6 +68,9 @@ std::vector<Point> getInputData()
 int main()
 {
   const uint32_t k = 5;
+  const Point center = {0, 0., 0., 0.}; 
+  auto distance_from_center = [&](const Point& p){ return distance(center, p);};
+
   MinFinder<double, Point> finder(distance_from_center, k);
   finder.push(getInputData());
   auto k_closest = finder.get_minimal();

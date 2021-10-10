@@ -24,7 +24,7 @@
 #include <vector>
 #include <tuple>
 #include <cassert>
-
+#include <queue>
 
 template <typename Distance, class Item>
 class MinFinder
