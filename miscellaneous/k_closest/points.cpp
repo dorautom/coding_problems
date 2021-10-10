@@ -26,6 +26,9 @@
 #include <tuple>
 #include <iostream>
 #include <cassert>
+#include "min_finder.h"
+
+// Problem: from N points (x,y,z) find k closest to the centre (0,0,0)
 
 typedef uint32_t PointID;
 
@@ -35,10 +38,6 @@ struct Point
   float x;
   float y;
   float z;
-
-  // Point(PointID id0, float x0, float y0, float z0) : id(id0), x(x0), y(y0), z(z0)
-  // {
-  // }
 };
 
 double distance(const Point& a, const Point& b)
@@ -68,52 +67,14 @@ std::vector<Point> getInputData()
     );
 }
 
-typedef std::tuple<double, Point> PointDistance;
-
-struct PointDistanceCompareLess
-{
-  bool operator()(PointDistance& a, PointDistance& b)
-  {
-    return std::get<0>(a) <= std::get<0>(b);
-  }
-};
-
-// TBD: detach algorihtm from specific data structure using template and custom compare function
-std::vector<PointDistance> getClosest(const std::vector<Point>& points, uint32_t k)
-{
-  std::priority_queue<PointDistance, std::vector<PointDistance>, PointDistanceCompareLess> k_closest;
-  for (const auto& point : points)
-  {
-    double distance = distance_from_center(point);
-    if (k_closest.size() < k)
-    {
-      PointDistance item = std::make_tuple(distance, point);
-      k_closest.push(item);
-    }
-    else
-    {
-      if (distance < std::get<0>(k_closest.top()))
-      {
-        k_closest.pop();
-        k_closest.push(std::make_tuple(distance, point));
-      }
-    }
-  }
-
-  std::vector<PointDistance> result;
-  result.reserve(k);
-  while (!k_closest.empty())
-  {
-    result.push_back(k_closest.top());
-    k_closest.pop();
-  }
-  return result;
-}
 
 int main()
 {
-  uint32_t k = 3;
-  std::vector<PointDistance> k_closest = getClosest(getInputData(), k);
+  const uint32_t k = 5;
+  MinFinder<double, Point> finder(distance_from_center, k);
+  finder.push(getInputData());
+  auto k_closest = finder.get_minimal();
+
   std::cout << k << "-closest:\n";
   assert(k_closest.size() == k);
   for (auto item : k_closest)
