@@ -30,24 +30,25 @@
 #include <cassert>
 #include <limits>
 #include <cmath>
+#include "string_builder.h"
 
 std::string compress(const std::string& input)
 {
-    std::string output;
+    // maximal number of items to concatenate is (size of input string)/2
+    string_builder::string_builder output(input.size() >> 1);
     long int max_n = std::numeric_limits<long int>::max();
     int n = 1;
     char c = 0;
     auto chunk = [&]() { std::stringstream s; s << n; s << c; return s.str(); };
     const char* next = input.c_str();
     c = *(next++);
-    output.reserve(input.size());
     while (c)
     {
         if (c == *next)
         {
             if (n == max_n)
             {
-                std::cout << "optimization works, input: " << input << ", output: " << output << ", max_n == " << max_n << '\n';
+                std::cout << "optimization works, input: " << input << ", output: " << output() << ", max_n == " << max_n << '\n';
                 return input;
             } 
             n++;
@@ -65,7 +66,7 @@ std::string compress(const std::string& input)
         }
         c = *(next++);
     }
-    return output;
+    return output();
 }
 
 int main(int argc, char** argv)
@@ -79,5 +80,6 @@ int main(int argc, char** argv)
     assert(test("aabb", "2a2b"));
     const char* x = "yxyxyxyxyxyxyxybbbbbbbbbbbbbbbbb";
     assert(test(x, x)); // test optimization
+    std::cout << "Success!\n";
     return 0;
 }
