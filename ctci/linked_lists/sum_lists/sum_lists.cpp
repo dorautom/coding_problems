@@ -100,7 +100,74 @@ std::forward_list<int> sum_lists(const std::forward_list<int>& l1, const std::fo
 namespace digits_forward_order
 {
 
-std::forward_list<int> sum_lists(const std::forward_list<int>& l1, const std::forward_list<int>& l2);
+class SumCalculator
+{
+
+    std::forward_list<int> list1_;
+    std::forward_list<int> list2_;
+
+    // assume len(l1) == len(l2)
+    int add_recursively(std::forward_list<int>::const_iterator iter1, std::forward_list<int>::const_iterator iter2,
+                        std::forward_list<int>& out)
+    {
+        // base case
+        if (iter1 == list1_.end() && iter2 == list2_.end())
+            return 0;
+        // verify assumption
+        assert(iter1 != list1_.end() && iter2 != list2_.end());
+        
+        // recursive case
+        int rest = *iter1 + *iter2;
+        rest += add_recursively(++iter1, ++iter2, out);
+        out.push_front(rest % 10);
+        return rest / 10;
+    }
+
+public:
+    SumCalculator(const std::forward_list<int>& l1, const std::forward_list<int>& l2) : list1_(l1), list2_(l2)
+    {
+        // extend shorter list with zeros to keep number value but have equal lengths
+        auto len = [](const std::forward_list<int>& l) 
+        { 
+            int n = 0; 
+            for (auto item : l) n++;
+            return n; 
+        };
+        auto expand = [](std::forward_list<int>& l, int n) 
+        { 
+            while (n)
+            { 
+                l.push_front(0); 
+                n--; 
+            }
+        };
+        int diff = len(list1_) - len(list2_);
+        if (diff > 0)
+        {
+            expand(list2_, diff);
+        }
+        else
+        if (diff < 0)
+        {
+            expand(list1_, -diff);
+        }
+    }
+
+    std::forward_list<int> operator()()
+    {
+        std::forward_list<int> sum;
+        int rest = add_recursively(list1_.cbegin(), list2_.cbegin(), sum);
+        if (rest)
+            sum.push_front(rest);
+        return sum;
+    }
+};
+
+std::forward_list<int> sum_lists(const std::forward_list<int>& l1, const std::forward_list<int>& l2)
+{
+    SumCalculator summer(l1, l2);
+    return summer();
+}
 
 }
 
@@ -113,8 +180,6 @@ std::ostream& operator<<(std::ostream& os, const std::forward_list<T>& l)
     return os;
 }
 
-using fwd_list_bin_operand = std::forward_list<int>(const std::forward_list<int>&, const std::forward_list<int>&);
-
 bool verify(const std::forward_list<int>& in1, const std::forward_list<int>& in2, const std::forward_list<int>& out_ref, 
             std::function<std::forward_list<int>(const std::forward_list<int>&, const std::forward_list<int>&)> tested_fun)
 {
@@ -126,8 +191,11 @@ bool verify(const std::forward_list<int>& in1, const std::forward_list<int>& in2
 int main()
 {
     assert(verify({8, 7, 9}, {5, 8, 6}, {3, 6, 6, 1}, digits_reverse_order::sum_lists));
-//    ref = {1, 6, 6, 3};
-//    assert(digits_forward_order::sum_lists({9, 7, 8}, {6, 8, 5}) == ref);
+    assert(verify({5},       {9, 9, 9}, {4, 0, 0, 1}, digits_reverse_order::sum_lists));
+    assert(verify({5},       {8},       {3, 1},       digits_reverse_order::sum_lists));
 
+    assert(verify({9, 7, 8}, {6, 8, 5}, {1, 6, 6, 3}, digits_forward_order::sum_lists));
+    assert(verify({5},       {8},       {1, 3},       digits_forward_order::sum_lists));
+    assert(verify({5},       {9, 9, 9}, {1, 0, 0, 4}, digits_forward_order::sum_lists));
     return 0;
 }
