@@ -59,6 +59,8 @@ class const_reference_type
 
 typedef const_reference_type<item_type> item_reference_type;
 
+// TODO: change std forward list to self-implemented list in order to access nodes by reference
+
 // returns reference to 1st intersecting item of `list1` and `list2` or empty if `list1` and `list2` do not intersect
 std::optional<item_reference_type> intersect(const std::forward_list<item_type>& list1, const std::forward_list<item_type>& list2)
 {
@@ -116,9 +118,9 @@ bool verify(const std::forward_list<item_type>& in1, const std::forward_list<ite
             std::function<std::optional<item_reference_type>(const std::forward_list<item_type>&, const std::forward_list<item_type>&)> tested_fun)
 {
     auto result = tested_fun(in1, in2);
-    if (result)
+    if (result.has_value())
     {
-        std::cout << result->value() << '\n';
+        std::cout << "intersection found: " << result->value() << '\n';
     }
 
     return (*result == *out_ref || 
@@ -130,7 +132,6 @@ int main()
     std::forward_list<item_type> list1;
     std::forward_list<item_type> list2;
     std::optional<item_reference_type> no_intersection;
-    // TODO: more tests
     assert(verify(list1, list2, no_intersection, intersect));
     return 0;
 }
