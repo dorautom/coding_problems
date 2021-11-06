@@ -21,7 +21,10 @@
 // SOFTWARE.
 
 
-// https://projecteuler.net/problem=51
+// https://projecteuler.net/problem=51        Primes primes(limit);
+        float ratio = primes.get_num_primes() * 1.0f / limit;
+        std::cout << "Number of primes below: " << limit << " is " << primes.get_num_primes() << " ratio: " << ratio << '\n';
+
 
 #include <cassert>
 #include <vector>
@@ -29,52 +32,12 @@
 #include <iostream>
 #include <primes/primes.h>
 
-class PrimesFamily
-{
-public:
-    PrimesFamily(uint32_t limit, uin32_t digits) : limit_(limit), digits_(digits), min_prime_(0), primes_(limit_)
-    {
-        assert(limit_ > 1);
-        assert(digits_ > 1);
-    }
-
-    const std::vector<uint32_t>& get_family() const
-    {
-        return family_;
-    }
-
-    uint32_t get_min_prime() const
-    {
-        return min_prime_;
-    }
-
-    void find_smallest_family(uint32_t bottom_limit, int family_count)
-    {
-        // go through primes with repeating digits, check if primes after replacement
-        // mark checked primes?
-    }
-
-private:
-    // find biggest family
-    void calculate()
-    {
-
-    }
-
-    uint32_t limit_;
-    uint32_t min_prime_;
-    std::vector<uint32_t> family_;
-    Primes primes_;
-};
-
 int main(int argc, char* argv[])
 {
     Primes::self_test();
-    PrimesFamily family(1000000, 3);
-    family.find_smallest_family(8);
-    std::cout << "Result: " << family.get_min_prime() << " consists of: ";
-    for (auto p : family.get_family())
-        std::cout << p << ' ';
-    std::cout << '\n';
+    const uint32_t limit = 10000000;
+    Primes primes(limit);
+    float ratio = primes.get_num_primes() * 1.0f / limit;
+    std::cout << "Number of primes below: " << limit << " is " << primes.get_num_primes() << " ratio: " << ratio << '\n';
     return 0;
 }

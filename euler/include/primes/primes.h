@@ -26,6 +26,7 @@
 #include <cassert>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 #include "primes.h"
 
 class Primes
@@ -44,6 +45,7 @@ public:
                 }
             }
         }
+        num_primes_ = std::count_if(is_prime_.begin(), is_prime_.end(), [](uint8_t value) { return value != 0; });
     }
 
     bool is_prime(uint32_t number) const
@@ -82,7 +84,13 @@ public:
         return num < limit_ ? num : 0;
     }
 
+    uint32_t get_num_primes() const
+    {
+        return num_primes_;
+    }
+
 private:
     uint32_t limit_;
     std::vector<uint8_t> is_prime_;
+    uint32_t num_primes_;
 };
