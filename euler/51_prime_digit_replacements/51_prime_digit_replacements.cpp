@@ -33,9 +33,6 @@
 // returns histogram of digits in a number
 std::vector<int> count_digits(std::string number);
 
-// class representing a digit in both numerical and character repesentation
-class Digit;
-typedef uint8_t Pos;
 /// finds positions of given digit in a number
 std::vector<Pos> get_positions(const std::string& number, const Digit& digit);
 
@@ -54,7 +51,13 @@ std::vector<uint64_t> get_family(uint64_t& left, uint64_t right, uint8_t repeats
 
 int main(int argc, char* argv[])
 {
-    uint64_t start = 56003;
+    const std::vector<uint64_t> family_6 = {13, 23, 43, 53, 73, 83};
+    const std::vector<uint64_t> family_7 = {56003, 56113, 56333, 56443, 56663, 56773, 56993};
+    uint64_t start = 1;
+    assert(get_family(start, 100000000, 2, 6) == family_6);
+    std::cout << "Now starting from " << start << '\n';
+    assert(get_family(start, 100000000, 2, 7) == family_7);
+    std::cout << "Now starting from " << start << '\n';
     std::cout << get_family(start, 100000000, 3, 8) << '\n';
     return 0;
 }
