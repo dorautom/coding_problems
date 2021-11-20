@@ -20,21 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <cstdint>
+#include <vector>
+#include <string>
 
-// https://projecteuler.net/problem=51
-
-#include <cassert>
-#include <iostream>
-#include <primes/primes.h>
-#include <combinatorial/ordered.h>
-#include <numerical/digit.h>
-#include <io/container.h>
+namespace digit
+{
 
 // returns histogram of digits in a number
 std::vector<int> count_digits(std::string number);
 
-// class representing a digit in both numerical and character repesentation
-class Digit;
+/// class representing a digit in both numerical and character repesentation
+class Digit
+{
+public:
+};
+
 typedef uint8_t Pos;
 /// finds positions of given digit in a number
 std::vector<Pos> get_positions(const std::string& number, const Digit& digit);
@@ -42,19 +43,4 @@ std::vector<Pos> get_positions(const std::string& number, const Digit& digit);
 /// replaces digits at given positions in a number with the digit given as an argument
 void replace_digits(std::string& number, const Digit& digit, const std::vector<Pos>& positions);
 
-/// returns a family of primes generated from a number by replacing digits at given positions with each one digit
-/// the numbers are sorted in ascending order
-std::vector<uint64_t> check_primes_family(const std::string& number, const std::vector<Pos>& positions);
-
-/// returns first family of primes in range [left, right) with repeating digit, 
-/// given number of repeated digits and minimal family size, updates left border ot range,
-/// so it can be run iteratively
-std::vector<uint64_t> get_family(uint64_t& left, uint64_t right, uint8_t repeats, int8_t family_size);
-
-
-int main(int argc, char* argv[])
-{
-    uint64_t start = 56003;
-    std::cout << get_family(start, 100000000, 3, 8) << '\n';
-    return 0;
 }
